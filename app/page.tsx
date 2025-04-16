@@ -59,6 +59,7 @@ export default function Home() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error occurred' }));
+        console.error('API Error Response:', errorData);
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
@@ -251,7 +252,11 @@ export default function Home() {
 
           {error && (
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+              <p className="text-red-600 dark:text-red-400 font-medium">Error:</p>
               <p className="text-red-600 dark:text-red-400">{error}</p>
+              <p className="text-xs text-red-500 dark:text-red-400 mt-2">
+                If this error persists, please check your MongoDB connection settings in Vercel.
+              </p>
             </div>
           )}
 

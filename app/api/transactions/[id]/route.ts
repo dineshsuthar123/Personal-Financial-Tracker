@@ -18,7 +18,6 @@ export async function PUT(
       );
     }
 
-    // Validate required fields
     if (!data.amount || !data.description || !data.type) {
       return NextResponse.json(
         { error: 'Missing required fields' },

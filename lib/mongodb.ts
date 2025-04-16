@@ -40,10 +40,17 @@ async function connectDB() {
 
     try {
       console.log('Connecting to MongoDB...');
+      console.log('MongoDB URI:', MONGODB_URI?.substring(0, 20) + '...');
+      
       cached.promise = mongoose.connect(MONGODB_URI as string, opts as mongoose.ConnectOptions);
       console.log('MongoDB connection initiated');
     } catch (error) {
       console.error('Error connecting to MongoDB:', error);
+      if (error instanceof Error) {
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+      }
       cached.promise = null;
       throw error;
     }
@@ -55,6 +62,11 @@ async function connectDB() {
   } catch (e) {
     cached.promise = null;
     console.error('Error establishing MongoDB connection:', e);
+    if (e instanceof Error) {
+      console.error('Error name:', e.name);
+      console.error('Error message:', e.message);
+      console.error('Error stack:', e.stack);
+    }
     throw e;
   }
 
