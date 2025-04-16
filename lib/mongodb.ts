@@ -1,12 +1,10 @@
 import mongoose from 'mongoose';
 
-// Define the type for our cached connection
 interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
 }
 
-// Declare the global mongoose property
 declare global {
   var mongoose: MongooseCache | undefined;
 }
@@ -17,13 +15,11 @@ if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
 }
 
-// Initialize the global mongoose cache if it doesn't exist
 if (!global.mongoose) {
   global.mongoose = { conn: null, promise: null };
 }
 
 async function connectDB() {
-  // Ensure global.mongoose is defined
   if (!global.mongoose) {
     global.mongoose = { conn: null, promise: null };
   }
