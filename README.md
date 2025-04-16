@@ -2,7 +2,6 @@
 
 A modern web application for tracking and visualizing personal finances built with Next.js, React, TypeScript, and MongoDB.
 
-![Personal Finance Visualizer]("D:\naresh suthar\Pictures\Screenshots\Screenshot 2025-04-16 221506.png")
 
 ## Features
 
