@@ -32,9 +32,13 @@ async function connectDB() {
   if (!global.mongoose.promise) {
     const opts = {
       bufferCommands: false,
-      serverSelectionTimeoutMS: 10000, // 10 seconds
-      socketTimeoutMS: 45000, // 45 seconds
-      connectTimeoutMS: 10000, // 10 seconds
+      serverSelectionTimeoutMS: 5000, // 5 seconds
+      socketTimeoutMS: 30000, // 30 seconds
+      connectTimeoutMS: 5000, // 5 seconds
+      maxPoolSize: 10,
+      minPoolSize: 5,
+      retryWrites: true,
+      retryReads: true,
     };
 
     try {

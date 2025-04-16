@@ -128,17 +128,37 @@ export default function Home() {
 
   const handleDelete = async (id: string) => {
     try {
+      setError(null);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
       const response = await fetch(`/api/transactions/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
-        throw new Error('Failed to delete transaction');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error occurred' }));
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
       await fetchTransactions();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to delete transaction:', error);
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          setError('Request timed out. Please try again.');
+        } else {
+          setError(`Failed to delete transaction: ${error.message}`);
+        }
+      } else {
+        setError('An unknown error occurred while deleting the transaction.');
+      }
     }
   };
 
@@ -206,12 +226,15 @@ export default function Home() {
                 Add Transaction
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent 
+              className="sm:max-w-md"
+              aria-describedby="dialog-description"
+            >
               <DialogHeader>
                 <DialogTitle>
                   {editingTransaction ? 'Edit Transaction' : 'Add Transaction'}
                 </DialogTitle>
-                <DialogDescription>
+                <DialogDescription id="dialog-description">
                   {editingTransaction ? 'Edit your transaction details below.' : 'Fill in the transaction details below.'}
                 </DialogDescription>
               </DialogHeader>

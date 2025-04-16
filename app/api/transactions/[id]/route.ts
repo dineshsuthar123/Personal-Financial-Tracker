@@ -8,7 +8,24 @@ export async function PUT(
 ) {
   try {
     await connectDB();
-    const data = await request.json();
+    let data;
+    try {
+      data = await request.json();
+    } catch (e) {
+      return NextResponse.json(
+        { error: 'Invalid JSON data' },
+        { status: 400 }
+      );
+    }
+
+    // Validate required fields
+    if (!data.amount || !data.description || !data.type) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
     const transaction = await Transaction.findByIdAndUpdate(
       params.id,
       data,
@@ -24,8 +41,10 @@ export async function PUT(
     
     return NextResponse.json(transaction);
   } catch (error) {
+    console.error('Error in PUT /api/transactions/[id]:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return NextResponse.json(
-      { error: 'Failed to update transaction' },
+      { error: 'Failed to update transaction', details: errorMessage },
       { status: 500 }
     );
   }
@@ -48,8 +67,10 @@ export async function DELETE(
     
     return NextResponse.json({ message: 'Transaction deleted successfully' });
   } catch (error) {
+    console.error('Error in DELETE /api/transactions/[id]:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return NextResponse.json(
-      { error: 'Failed to delete transaction' },
+      { error: 'Failed to delete transaction', details: errorMessage },
       { status: 500 }
     );
   }
