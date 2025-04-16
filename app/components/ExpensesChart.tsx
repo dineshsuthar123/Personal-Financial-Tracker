@@ -20,7 +20,7 @@ interface ExpensesChartProps {
   transactions: Transaction[];
 }
 
-export default function ExpensesChart({ transactions }: ExpensesChartProps) {
+export default function ExpensesChart({ transactions = [] }: ExpensesChartProps) {
   const monthlyData = useMemo(() => {
     const now = new Date();
     const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
@@ -34,7 +34,7 @@ export default function ExpensesChart({ transactions }: ExpensesChartProps) {
       const monthStart = startOfMonth(month);
       const monthEnd = endOfMonth(month);
 
-      const monthlyExpenses = transactions
+      const monthlyExpenses = (transactions || [])
         .filter((transaction) => {
           const transactionDate = new Date(transaction.date);
           return (

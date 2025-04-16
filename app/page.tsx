@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -162,6 +163,9 @@ export default function Home() {
                 <DialogTitle>
                   {editingTransaction ? 'Edit Transaction' : 'Add Transaction'}
                 </DialogTitle>
+                <DialogDescription>
+                  {editingTransaction ? 'Edit your transaction details below.' : 'Fill in the transaction details below.'}
+                </DialogDescription>
               </DialogHeader>
               <TransactionForm
                 onSubmit={handleSubmit}
