@@ -1,89 +1,96 @@
-💰 Personal Finance Visualizer
-A modern web application to track and visualize personal finances, built using Next.js, React, and MongoDB. Easily manage transactions, monitor expenses, and gain financial insights through clean UI and data visualizations.
+# Personal Finance Visualizer
 
-✨ Features
-✅ Stage 1 (Completed)
-➕ Add, ✏️ edit, and ❌ delete transactions
+A modern web application for tracking and visualizing personal finances built with Next.js, React, TypeScript, and MongoDB.
 
-📋 Transaction list with sorting and filtering
+![Personal Finance Visualizer](https://via.placeholder.com/800x400?text=Personal+Finance+Visualizer)
 
-📊 Monthly expenses chart using Recharts
+## Features
 
-✅ Basic form validation
+- **Transaction Management**: Add, edit, and delete income and expense transactions
+- **Data Visualization**: View monthly expenses through interactive charts
+- **Filtering & Sorting**: Filter transactions by type and date range
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **Modern UI**: Built with shadcn/ui components for a polished look and feel
 
-🔜 Stage 2 (Planned)
-🏷️ Transaction categories
+## Tech Stack
 
-📈 Category-wise expense breakdown
+- **Frontend**: Next.js 14, React, TypeScript
+- **Styling**: Tailwind CSS, shadcn/ui components
+- **Data Visualization**: Recharts
+- **Database**: MongoDB
+- **State Management**: React Hooks
 
-📊 Summary dashboard with key metrics
+## Getting Started
 
-🔮 Stage 3 (Planned)
-🎯 Monthly budget tracking
+### Prerequisites
 
-📉 Budget vs actual analysis
+- Node.js 18.x or higher
+- MongoDB running locally or a MongoDB Atlas account
 
-💡 Personalized spending insights
+### Installation
 
-🛠 Tech Stack
-Next.js 14
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/personal-finance-visualizer.git
+   cd personal-finance-visualizer
+   ```
 
-React + TypeScript
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-Tailwind CSS + shadcn/ui
+3. Create a `.env.local` file in the root directory with the following content:
+   ```
+   MONGODB_URI=mongodb://localhost:27017/personal-finance
+   ```
+   Replace with your MongoDB connection string if using MongoDB Atlas.
 
-Recharts (for visualizations)
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-MongoDB + Mongoose
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-🚀 Getting Started
-Follow these steps to run the project locally:
+## Project Structure
 
-1. Clone the Repository
-bash
-Copy
-Edit
-git clone https://github.com/your-username/personal-finance-visualizer.git
-cd personal-finance-visualizer
-2. Install Dependencies
-bash
-Copy
-Edit
-npm install
-3. Set Up Environment Variables
-Create a .env.local file in the root directory:
-
-ini
-Copy
-Edit
-MONGODB_URI=your_mongodb_connection_string
-4. Run the Development Server
-bash
-Copy
-Edit
-npm run dev
-Open http://localhost:3000 in your browser to view the app.
-
-📁 Project Structure
-php
-Copy
-Edit
+```
 personal-finance-visualizer/
-├── app/
-│   ├── api/          # API route handlers
-│   ├── components/   # Reusable UI components
-│   ├── lib/          # Utility functions and helpers
-│   └── page.tsx      # Main landing page
-├── models/           # Mongoose models for MongoDB
-└── public/           # Static assets
-📌 License
-This project is licensed under the MIT License.
+├── app/                  # Next.js app directory
+│   ├── api/              # API routes
+│   ├── components/       # React components
+│   └── page.tsx          # Main page component
+├── components/           # Shared components
+│   └── ui/               # UI components (shadcn/ui)
+├── lib/                  # Utility functions
+├── models/               # MongoDB models
+├── public/               # Static assets
+└── styles/               # Global styles
+```
 
-🙌 Contributing
-Contributions, feedback, and suggestions are welcome!
-Feel free to open an issue or submit a pull request.
+## Usage
+
+1. **Adding Transactions**: Click the "Add Transaction" button to add a new income or expense.
+2. **Viewing Transactions**: All transactions are displayed in the Transactions tab.
+3. **Visualizing Data**: Switch to the Overview tab to see your monthly expenses chart.
+4. **Filtering**: Use the filter dropdowns to filter transactions by type and date range.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- [shadcn/ui](https://ui.shadcn.com/) for the beautiful UI components
+- [Recharts](https://recharts.org/) for the charting library
+- [Next.js](https://nextjs.org/) for the amazing React framework
 
 📬 Contact
 Got questions or suggestions?
-Reach out on [your preferred social/contact link].
+Reach out on @Dinesh12839101[Twitter]
 
