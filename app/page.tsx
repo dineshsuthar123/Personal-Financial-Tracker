@@ -33,6 +33,7 @@ export default function Home() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [filterType, setFilterType] = useState<'all' | 'expense' | 'income'>('all');
   const [dateRange, setDateRange] = useState<'all' | 'month' | 'quarter' | 'year'>('all');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTransactions();
@@ -40,17 +41,42 @@ export default function Home() {
 
   const fetchTransactions = async () => {
     try {
-      const response = await fetch('/api/transactions');
-      const data = await response.json();
+      setIsLoading(true);
+      const response = await fetch('/api/transactions', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: AbortSignal.timeout(30000),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data: Transaction[] = await response.json();
       setTransactions(data);
-    } catch (error) {
-      console.error('Failed to fetch transactions:', error);
+    } catch (error: unknown) {
+      console.error('Error fetching transactions:', error);
+      if (error instanceof Error) {
+        if (error.name === 'TimeoutError') {
+          setError('Request timed out. Please try again.');
+        } else if (error.name === 'AbortError') {
+          setError('Request was aborted. Please try again.');
+        } else {
+          setError(`Failed to fetch transactions: ${error.message}`);
+        }
+      } else {
+        setError('An unknown error occurred while fetching transactions.');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSubmit = async (data: Omit<Transaction, '_id'>) => {
-    setIsLoading(true);
     try {
+      setIsLoading(true);
       const url = editingTransaction
         ? `/api/transactions/${editingTransaction._id}`
         : '/api/transactions';
@@ -62,17 +88,29 @@ export default function Home() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
+        signal: AbortSignal.timeout(30000),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save transaction');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       await fetchTransactions();
       setIsDialogOpen(false);
       setEditingTransaction(null);
-    } catch (error) {
-      console.error('Failed to save transaction:', error);
+    } catch (error: unknown) {
+      console.error('Error submitting transaction:', error);
+      if (error instanceof Error) {
+        if (error.name === 'TimeoutError') {
+          setError('Request timed out. Please try again.');
+        } else if (error.name === 'AbortError') {
+          setError('Request was aborted. Please try again.');
+        } else {
+          setError(`Failed to submit transaction: ${error.message}`);
+        }
+      } else {
+        setError('An unknown error occurred while submitting the transaction.');
+      }
     } finally {
       setIsLoading(false);
     }

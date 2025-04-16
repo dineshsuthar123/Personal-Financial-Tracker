@@ -4,8 +4,11 @@ import Transaction from '@/models/Transaction';
 
 export async function GET() {
   try {
+    console.log('GET /api/transactions - Connecting to database...');
     await connectDB();
+    console.log('GET /api/transactions - Fetching transactions...');
     const transactions = await Transaction.find().sort({ date: -1 });
+    console.log(`GET /api/transactions - Found ${transactions.length} transactions`);
     return NextResponse.json(transactions);
   } catch (error) {
     console.error('Error in GET /api/transactions:', error);
@@ -18,10 +21,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    console.log('POST /api/transactions - Connecting to database...');
     await connectDB();
     const data = await request.json();
-    console.log('Received transaction data:', data);
+    console.log('POST /api/transactions - Received data:', data);
+    console.log('POST /api/transactions - Creating transaction...');
     const transaction = await Transaction.create(data);
+    console.log('POST /api/transactions - Transaction created successfully');
     return NextResponse.json(transaction, { status: 201 });
   } catch (error) {
     console.error('Error in POST /api/transactions:', error);

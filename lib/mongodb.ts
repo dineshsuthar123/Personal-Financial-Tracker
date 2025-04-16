@@ -32,13 +32,18 @@ async function connectDB() {
   if (!global.mongoose.promise) {
     const opts = {
       bufferCommands: false,
+      serverSelectionTimeoutMS: 10000, // 10 seconds
+      socketTimeoutMS: 45000, // 45 seconds
+      connectTimeoutMS: 10000, // 10 seconds
     };
 
     try {
+      console.log('Connecting to MongoDB...');
       global.mongoose.promise = mongoose.connect(MONGODB_URI as string, opts as mongoose.ConnectOptions);
       console.log('MongoDB connection initiated');
     } catch (error) {
       console.error('Error connecting to MongoDB:', error);
+      global.mongoose.promise = null;
       throw error;
     }
   }
