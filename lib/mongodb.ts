@@ -12,56 +12,53 @@ declare global {
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  console.error('MONGODB_URI is not defined in environment variables');
-  throw new Error('Please define the MONGODB_URI environment variable');
+  throw new Error('Please define the MONGODB_URI environment variable inside .env');
 }
 
+let cached: MongooseCache = global.mongoose || { conn: null, promise: null };
+
 if (!global.mongoose) {
-  global.mongoose = { conn: null, promise: null };
+  global.mongoose = cached;
 }
 
 async function connectDB() {
-  if (!global.mongoose) {
-    global.mongoose = { conn: null, promise: null };
+  if (cached.conn) {
+    return cached.conn;
   }
 
-  if (global.mongoose.conn) {
-    return global.mongoose.conn;
-  }
-
-  if (!global.mongoose.promise) {
+  if (!cached.promise) {
     const opts = {
       bufferCommands: false,
-      serverSelectionTimeoutMS: 5000, // 5 seconds
-      socketTimeoutMS: 30000, // 30 seconds
-      connectTimeoutMS: 5000, // 5 seconds
       maxPoolSize: 10,
       minPoolSize: 5,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 30000,
+      connectTimeoutMS: 5000,
       retryWrites: true,
       retryReads: true,
     };
 
     try {
       console.log('Connecting to MongoDB...');
-      global.mongoose.promise = mongoose.connect(MONGODB_URI as string, opts as mongoose.ConnectOptions);
+      cached.promise = mongoose.connect(MONGODB_URI as string, opts as mongoose.ConnectOptions);
       console.log('MongoDB connection initiated');
     } catch (error) {
       console.error('Error connecting to MongoDB:', error);
-      global.mongoose.promise = null;
+      cached.promise = null;
       throw error;
     }
   }
 
   try {
-    global.mongoose.conn = await global.mongoose.promise;
+    cached.conn = await cached.promise;
     console.log('MongoDB connected successfully');
   } catch (e) {
-    global.mongoose.promise = null;
+    cached.promise = null;
     console.error('Error establishing MongoDB connection:', e);
     throw e;
   }
 
-  return global.mongoose.conn;
+  return cached.conn;
 }
 
 export default connectDB; 

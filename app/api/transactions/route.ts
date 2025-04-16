@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Transaction from '@/models/Transaction';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   try {
     console.log('GET /api/transactions - Connecting to database...');
