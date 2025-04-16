@@ -42,16 +42,23 @@ export default function Home() {
   const fetchTransactions = async () => {
     try {
       setIsLoading(true);
+      setError(null);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
       const response = await fetch('/api/transactions', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        signal: AbortSignal.timeout(30000),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error occurred' }));
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
       const data: Transaction[] = await response.json();
@@ -59,10 +66,8 @@ export default function Home() {
     } catch (error: unknown) {
       console.error('Error fetching transactions:', error);
       if (error instanceof Error) {
-        if (error.name === 'TimeoutError') {
+        if (error.name === 'AbortError') {
           setError('Request timed out. Please try again.');
-        } else if (error.name === 'AbortError') {
-          setError('Request was aborted. Please try again.');
         } else {
           setError(`Failed to fetch transactions: ${error.message}`);
         }
@@ -77,6 +82,10 @@ export default function Home() {
   const handleSubmit = async (data: Omit<Transaction, '_id'>) => {
     try {
       setIsLoading(true);
+      setError(null);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
       const url = editingTransaction
         ? `/api/transactions/${editingTransaction._id}`
         : '/api/transactions';
@@ -88,11 +97,14 @@ export default function Home() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
-        signal: AbortSignal.timeout(30000),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error occurred' }));
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
       await fetchTransactions();
@@ -101,10 +113,8 @@ export default function Home() {
     } catch (error: unknown) {
       console.error('Error submitting transaction:', error);
       if (error instanceof Error) {
-        if (error.name === 'TimeoutError') {
+        if (error.name === 'AbortError') {
           setError('Request timed out. Please try again.');
-        } else if (error.name === 'AbortError') {
-          setError('Request was aborted. Please try again.');
         } else {
           setError(`Failed to submit transaction: ${error.message}`);
         }
