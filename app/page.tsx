@@ -17,6 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PlusCircle, TrendingUp, TrendingDown, Calendar, Filter } from 'lucide-react';
 import { format, subMonths } from 'date-fns';
+import ErrorBoundary from './components/ErrorBoundary';
 
 interface Transaction {
   _id: string;
@@ -208,151 +209,159 @@ export default function Home() {
   const balance = totalIncome - totalExpenses;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <main className="container mx-auto p-4 space-y-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
-              Personal Finance Tracker
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Manage and visualize your financial data
-            </p>
-          </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Add Transaction
-              </Button>
-            </DialogTrigger>
-            <DialogContent 
-              className="sm:max-w-md"
-              aria-describedby="dialog-description"
-            >
-              <DialogHeader>
-                <DialogTitle>
-                  {editingTransaction ? 'Edit Transaction' : 'Add Transaction'}
-                </DialogTitle>
-                <DialogDescription id="dialog-description">
-                  {editingTransaction ? 'Edit your transaction details below.' : 'Fill in the transaction details below.'}
-                </DialogDescription>
-              </DialogHeader>
-              <TransactionForm
-                onSubmit={handleSubmit}
-                initialData={editingTransaction || undefined}
-                isLoading={isLoading}
-              />
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card className="bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Balance</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">${balance.toFixed(2)}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {balance >= 0 ? 'Positive balance' : 'Negative balance'}
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <main className="container mx-auto p-4 space-y-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+                Personal Finance Tracker
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Manage and visualize your financial data
               </p>
-            </CardContent>
-          </Card>
-          <Card className="bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Income</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">${totalIncome.toFixed(2)}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                <TrendingUp className="inline h-3 w-3 mr-1" />
-                All time income
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Expenses</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">${totalExpenses.toFixed(2)}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                <TrendingDown className="inline h-3 w-3 mr-1" />
-                All time expenses
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="transactions">Transactions</TabsTrigger>
-          </TabsList>
-          <TabsContent value="overview" className="space-y-4">
-            <Card className="bg-white dark:bg-gray-800 shadow-md">
-              <CardHeader>
-                <CardTitle>Monthly Expenses</CardTitle>
-                <CardDescription>
-                  Track your spending patterns over time
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ExpensesChart transactions={transactions} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="transactions" className="space-y-4">
-            <Card className="bg-white dark:bg-gray-800 shadow-md">
-              <CardHeader>
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                  <div>
-                    <CardTitle>Transaction History</CardTitle>
-                    <CardDescription>
-                      View and manage your financial transactions
-                    </CardDescription>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <div className="flex items-center space-x-2">
-                      <Filter className="h-4 w-4 text-muted-foreground" />
-                      <select 
-                        className="text-sm border rounded-md px-2 py-1 bg-transparent"
-                        value={filterType}
-                        onChange={(e) => setFilterType(e.target.value as 'all' | 'expense' | 'income')}
-                      >
-                        <option value="all">All Types</option>
-                        <option value="expense">Expenses</option>
-                        <option value="income">Income</option>
-                      </select>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <select 
-                        className="text-sm border rounded-md px-2 py-1 bg-transparent"
-                        value={dateRange}
-                        onChange={(e) => setDateRange(e.target.value as 'all' | 'month' | 'quarter' | 'year')}
-                      >
-                        <option value="all">All Time</option>
-                        <option value="month">Last Month</option>
-                        <option value="quarter">Last Quarter</option>
-                        <option value="year">Last Year</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <TransactionList
-                  transactions={filteredTransactions}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
+            </div>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add Transaction
+                </Button>
+              </DialogTrigger>
+              <DialogContent 
+                className="sm:max-w-md"
+                aria-describedby="dialog-description"
+              >
+                <DialogHeader>
+                  <DialogTitle>
+                    {editingTransaction ? 'Edit Transaction' : 'Add Transaction'}
+                  </DialogTitle>
+                  <DialogDescription id="dialog-description">
+                    {editingTransaction ? 'Edit your transaction details below.' : 'Fill in the transaction details below.'}
+                  </DialogDescription>
+                </DialogHeader>
+                <TransactionForm
+                  onSubmit={handleSubmit}
+                  initialData={editingTransaction || undefined}
+                  isLoading={isLoading}
                 />
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {error && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+              <p className="text-red-600 dark:text-red-400">{error}</p>
+            </div>
+          )}
+
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card className="bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Total Balance</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">${balance.toFixed(2)}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {balance >= 0 ? 'Positive balance' : 'Negative balance'}
+                </p>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
-      </main>
-    </div>
+            <Card className="bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Total Income</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-600">${totalIncome.toFixed(2)}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  <TrendingUp className="inline h-3 w-3 mr-1" />
+                  All time income
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Total Expenses</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-red-600">${totalExpenses.toFixed(2)}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  <TrendingDown className="inline h-3 w-3 mr-1" />
+                  All time expenses
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Tabs defaultValue="overview" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="transactions">Transactions</TabsTrigger>
+            </TabsList>
+            <TabsContent value="overview" className="space-y-4">
+              <Card className="bg-white dark:bg-gray-800 shadow-md">
+                <CardHeader>
+                  <CardTitle>Monthly Expenses</CardTitle>
+                  <CardDescription>
+                    Track your spending patterns over time
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ExpensesChart transactions={transactions} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="transactions" className="space-y-4">
+              <Card className="bg-white dark:bg-gray-800 shadow-md">
+                <CardHeader>
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                      <CardTitle>Transaction History</CardTitle>
+                      <CardDescription>
+                        View and manage your financial transactions
+                      </CardDescription>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <div className="flex items-center space-x-2">
+                        <Filter className="h-4 w-4 text-muted-foreground" />
+                        <select 
+                          className="text-sm border rounded-md px-2 py-1 bg-transparent"
+                          value={filterType}
+                          onChange={(e) => setFilterType(e.target.value as 'all' | 'expense' | 'income')}
+                        >
+                          <option value="all">All Types</option>
+                          <option value="expense">Expenses</option>
+                          <option value="income">Income</option>
+                        </select>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <select 
+                          className="text-sm border rounded-md px-2 py-1 bg-transparent"
+                          value={dateRange}
+                          onChange={(e) => setDateRange(e.target.value as 'all' | 'month' | 'quarter' | 'year')}
+                        >
+                          <option value="all">All Time</option>
+                          <option value="month">Last Month</option>
+                          <option value="quarter">Last Quarter</option>
+                          <option value="year">Last Year</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <TransactionList
+                    transactions={filteredTransactions}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </main>
+      </div>
+    </ErrorBoundary>
   );
 } 
